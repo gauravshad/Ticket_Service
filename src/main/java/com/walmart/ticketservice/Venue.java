@@ -25,7 +25,7 @@ public class Venue {
         this.available = this.capacity;
         this.reserved = 0;
         this.onHold = 0;
-        this.counter = -1;
+        this.counter = 0;
         this.seats = Arrays.asList(new String[this.capacity]);
     }
 
@@ -55,6 +55,14 @@ public class Venue {
 
     public List<String> getSeats() {
         return seats;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public int getCounter() {
+        return counter;
     }
     
     public synchronized void book(int n, String customer){
