@@ -29,6 +29,7 @@ public class VenueTicketBookingService implements TicketService{
         venue = new Venue(capacity);
         this.holdDuration = duration;
         onHold = new HashMap<Integer, SeatHold>();
+        booking = new HashMap<String, Reservation>();
     }
     
     private synchronized void removeExpiredHolds(){
