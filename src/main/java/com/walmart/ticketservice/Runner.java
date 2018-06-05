@@ -17,10 +17,24 @@ public class Runner {
         System.out.println("1. Check available seats \n2. Hold seats \n3. Reserve seats \n4. Get reservation details \n5. Help [show commands] \n6. Exit");
     }
     public static void main(String[] args){
-        int capacity = 25;
-        int duration = 40;
+        int capacity = 0;
+        int duration = 0;
         int in = 0;
         boolean choice = true;
+        
+        if(args.length < 2){
+            System.out.println("Insufficient arguments. Please try to run again with capacity and duration!");
+            System.exit(0);
+        }
+        
+        try{
+            capacity = Integer.parseInt(args[0]);
+            duration = Integer.parseInt(args[1]);
+        }
+        catch(Exception e){
+            System.out.println("Invalid arguments. Please try to run again with Integral values!");
+            System.exit(0);
+        }
         
         VenueTicketBookingService service = new VenueTicketBookingService(capacity, Duration.ofSeconds(duration));
         Scanner input = new Scanner(System.in);
