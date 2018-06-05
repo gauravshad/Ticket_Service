@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -34,23 +35,33 @@ public class VenueTicketBookingService implements TicketService{
     
     private synchronized void removeExpiredHolds(){
         int sum = 0;
-        Set<Integer> keys = onHold.keySet();
-        
-        for(int id:keys){
-            if(onHold.get(id).isExpired())
-                onHold.remove(id);
-            else
-                sum = sum + onHold.get(id).getCountOfSeats();
+        Set<Integer> toRemove = new HashSet<Integer>();
+        synchronized(onHold){
+            Set<Integer> keys = onHold.keySet();
+
+            for(int id:keys){
+                if(onHold.get(id).isExpired())
+                    toRemove.add(id);
+                else
+                    sum = sum + onHold.get(id).getCountOfSeats();
+            }
+            
+            for(int k:toRemove)
+                onHold.remove(k);
         }
         
-        venue.setOnHold(sum);
-        venue.setAvailable(venue.getCapacity() - venue.getReserved() - venue.getOnHold());
+        synchronized(venue){
+            venue.setOnHold(sum);
+            venue.setAvailable(venue.getCapacity() - venue.getReserved() - venue.getOnHold());
+        }
     }
     
     
     public synchronized int numSeatsAvailable(){
         this.removeExpiredHolds();
-        return venue.getAvailable();
+        synchronized(venue){
+            return venue.getAvailable();
+        }
     }
     
     private boolean validate(String emailStr) {
@@ -69,9 +80,13 @@ public class VenueTicketBookingService implements TicketService{
         
         if(numSeats < available){
             SeatHold seathold = new SeatHold(customerEmail, numSeats, Instant.now().plus(holdDuration));
-            onHold.put(seathold.getHoldID(), seathold);
-            venue.setOnHold(venue.getOnHold() + numSeats);
-            venue.setAvailable(venue.getAvailable() - numSeats);
+            synchronized(onHold){
+                onHold.put(seathold.getHoldID(), seathold);
+            }
+            synchronized(venue){
+                venue.setOnHold(venue.getOnHold() + numSeats);
+                venue.setAvailable(venue.getAvailable() - numSeats);
+            }
             
             return seathold;
         }
@@ -80,27 +95,30 @@ public class VenueTicketBookingService implements TicketService{
     }
     
     public synchronized String reserveSeats(int seatHoldId, String customerEmail){
-        if(!onHold.containsKey(seatHoldId))
-            return null;
-        
-        if(onHold.get(seatHoldId).isExpired()){
-            venue.setOnHold(venue.getOnHold() - onHold.get(seatHoldId).getCountOfSeats());
-            venue.setAvailable(venue.getAvailable() + onHold.get(seatHoldId).getCountOfSeats());
-            
+        SeatHold hold;
+        int start, end;
+        synchronized(onHold){
+            if(!onHold.containsKey(seatHoldId))
+                return null;
+
+            if(onHold.get(seatHoldId).isExpired()){
+                venue.setOnHold(venue.getOnHold() - onHold.get(seatHoldId).getCountOfSeats());
+                venue.setAvailable(venue.getAvailable() + onHold.get(seatHoldId).getCountOfSeats());
+
+                onHold.remove(seatHoldId);
+
+                return null;
+            }
+
+            if(!onHold.get(seatHoldId).getCustomerMail().equals(customerEmail))
+                throw new IllegalArgumentException("Invalid seatHoldId or customerEmail");
+
+            hold = onHold.get(seatHoldId);
+            start = venue.getCounter()+1;
+            venue.book(hold.getCountOfSeats(), hold.getCustomerMail());
+            end = venue.getCounter();
             onHold.remove(seatHoldId);
-            
-            return null;
         }
-        
-        if(!onHold.get(seatHoldId).getCustomerMail().equals(customerEmail))
-            throw new IllegalArgumentException("Invalid seatHoldId or customerEmail");
-        
-        SeatHold hold = onHold.get(seatHoldId);
-        int start = venue.getCounter()+1;
-        venue.book(hold.getCountOfSeats(), hold.getCustomerMail());
-        int end = venue.getCounter();
-        onHold.remove(seatHoldId);
-        
         List<Integer> seats = new ArrayList<Integer>();
         
         for(int i=start; i<=end; i++)
@@ -110,8 +128,10 @@ public class VenueTicketBookingService implements TicketService{
         
         booking.put(reservation.getReserveCode(), reservation);
         
-        venue.setOnHold(venue.getOnHold() - hold.getCountOfSeats());
-        venue.setReserved(venue.getReserved() + hold.getCountOfSeats());
+        synchronized(venue){
+            venue.setOnHold(venue.getOnHold() - hold.getCountOfSeats());
+            venue.setReserved(venue.getReserved() + hold.getCountOfSeats());
+        }
         
         return reservation.getReserveCode();
     }
