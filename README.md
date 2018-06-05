@@ -1,4 +1,4 @@
-# Walmart_Labs_Ticket_Service
+# Ticket_Service
 
 ## Build Instructions
 1. I am using maven to build this project.
