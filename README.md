@@ -4,7 +4,7 @@
 1. I am using maven to build this project.
 2. When inside this repository, use `mvn clean package` to build the project. This command will run the test cases and build the jar in the target folder.
 3. Change current directory to target `cd target/`
-4. Use this command to run the ticket service `java -jar ticketservice-1.0-SNAPSHOT.jar 44 32` . 44 and 32 are the command line arguments where first argument stands for capacity of the venue (sample command uses 44) and second stands for hold duration (sample command uses 32). You can use any integral values for those arguments. This command will start the service where you can easily naviagte through the command line.
+4. Use this command to run the ticket service `java -jar ticketservice-1.0-SNAPSHOT.jar 44 32` . 44 and 32 are the command line arguments where first argument stands for capacity of the venue (sample command uses 44) and second stands for the hold duration in seconds (sample command uses 32). You can use any integral values for those arguments. This command will start the service where you can easily naviagte through the command line.
 
 ## Assumptions
 1. To find the best seats, I am assuming that the best seats are the ones with the lowest seat numbers.
