@@ -1,8 +1,19 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2018 gaurav shad.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package com.walmart.ticketservice;
 
 import java.time.Duration;
@@ -26,6 +37,11 @@ public class VenueTicketBookingService implements TicketService{
     private HashMap<String, Reservation> booking;
     private final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     
+    /**
+     * 
+     * @param capacity to initialize the venue with given capacity
+     * @param duration set the hold duration
+     */
     public VenueTicketBookingService(int capacity, Duration duration){
         venue = new Venue(capacity);
         this.holdDuration = duration;
@@ -33,6 +49,9 @@ public class VenueTicketBookingService implements TicketService{
         booking = new HashMap<String, Reservation>();
     }
     
+    /**
+     * this function will remove that are expired at the current time Instant
+     */
     private synchronized void removeExpiredHolds(){
         int sum = 0;
         Set<Integer> toRemove = new HashSet<Integer>();
@@ -56,7 +75,10 @@ public class VenueTicketBookingService implements TicketService{
         }
     }
     
-    
+    /**
+     * 
+     * @return the number of seats available at the venue at the moment
+     */
     public synchronized int numSeatsAvailable(){
         this.removeExpiredHolds();
         synchronized(venue){
@@ -64,11 +86,21 @@ public class VenueTicketBookingService implements TicketService{
         }
     }
     
+    /**
+     * 
+     * @param emailStr email id to validate
+     * @return whether the given email is valid or not
+     */
     private boolean validate(String emailStr) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
         return matcher.find();
 }
-    
+    /**
+     * 
+     * @param numSeats number of seats to hold
+     * @param customerEmail customer email id
+     * @return null if enough seats are not available else seat hold object
+     */
     public synchronized SeatHold findAndHoldSeats(int numSeats, String customerEmail){
         if(!validate(customerEmail))
             throw new IllegalArgumentException("Invalid Email address");
@@ -94,6 +126,12 @@ public class VenueTicketBookingService implements TicketService{
             return null;
     }
     
+    /**
+     * 
+     * @param seatHoldId Id given by previous function to confirm the hold
+     * @param customerEmail email used to hold tickets
+     * @return null if the tickets are not reserved else reservation confirmation code
+     */
     public synchronized String reserveSeats(int seatHoldId, String customerEmail){
         SeatHold hold;
         int start, end;
@@ -136,6 +174,11 @@ public class VenueTicketBookingService implements TicketService{
         return reservation.getReserveCode();
     }
     
+    /**
+     * 
+     * @param reserveId confirmation code
+     * @return list of seat numbers reserved against that reservation id
+     */
     public synchronized List<Integer> getReservedSeats(String reserveId){
         if(booking.containsKey(reserveId))
             return booking.get(reserveId).getSeats();

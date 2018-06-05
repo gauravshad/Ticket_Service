@@ -1,7 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2018 gaurav shad.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import com.walmart.ticketservice.SeatHold;
@@ -23,6 +33,7 @@ import static org.junit.Assert.*;
  */
 public class VenueTicketBookingServiceTest {
     VenueTicketBookingService service;
+    
     public VenueTicketBookingServiceTest() {
     }
     
@@ -34,6 +45,9 @@ public class VenueTicketBookingServiceTest {
     public static void tearDownClass() {
     }
     
+    /**
+     * to initialize a service used for testing
+     */
     @Before
     public void setUp() {
         service = new VenueTicketBookingService(50, Duration.ofSeconds(5));
@@ -42,18 +56,25 @@ public class VenueTicketBookingServiceTest {
     @After
     public void tearDown() {
     }
-
+    
+    /**
+     * to test the numSeatsAvailable functionality
+     */
     @Test
     public void numSeatsAvailableTest(){
+        System.out.println("    .Running numSeatsAvailableTest");
         assert(service.numSeatsAvailable() == 50);
     }
     
+    /**
+     * to test findAndHoldSeats functionality
+     */
     @Test
     public void findAndHoldSeatsTest(){
+        System.out.println("    .Running findAndHoldSeatsTest");
         SeatHold hold1 = service.findAndHoldSeats(5, "gs@mail.com");
         assertNotNull(hold1);
         assert(service.numSeatsAvailable() == 45);
-        
         
         SeatHold hold2 = service.findAndHoldSeats(10, "abc@abc.com");
         assertNotNull(hold2);
@@ -88,8 +109,12 @@ public class VenueTicketBookingServiceTest {
         }
     }
     
+    /**
+     * to test reserveSeats functionality
+     */
     @Test
     public void reserveSeatsTest(){
+        System.out.println("    .Running reserveSeatsTest");
         SeatHold hold = service.findAndHoldSeats(5, "gs@mail.com");
         assertNotNull(hold);
         
@@ -111,8 +136,12 @@ public class VenueTicketBookingServiceTest {
         
     }
     
+    /**
+     * to test getReservedSeats functionality
+     */
     @Test
     public void getReservedSeatsTest(){
+        System.out.println("    .Running getReservedSeatsTest");
         SeatHold hold = service.findAndHoldSeats(2, "rt@mail.com");
         assertNotNull(hold);
         

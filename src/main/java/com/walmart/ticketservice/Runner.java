@@ -1,8 +1,19 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2018 gaurav shad.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package com.walmart.ticketservice;
 
 import java.time.Duration;
@@ -13,9 +24,14 @@ import java.util.Scanner;
  * @author gaurav shad
  */
 public class Runner {
+    
+    /**
+     * display the options on the screen
+     */
     private static void populateOptions(){
         System.out.println("1. Check available seats \n2. Hold seats \n3. Reserve seats \n4. Get reservation details \n5. Help [show commands] \n6. Exit");
     }
+    
     public static void main(String[] args){
         int capacity = 0;
         int duration = 0;
@@ -52,8 +68,6 @@ public class Runner {
                 System.out.println("Invalid input. Please try again!");
                 continue;
             }
-            
-            
             
             switch(in){
                 case 1: System.out.println("Seats available = " + service.numSeatsAvailable());
@@ -106,8 +120,6 @@ public class Runner {
                         
                         System.out.print("Enter your Email: ");
                         Mail = input.next();
-                        
-                        
                         String code;
                         
                         try{
@@ -155,7 +167,6 @@ public class Runner {
                         Thread.sleep(2000);
                         }
                         catch(Exception e){
-                            
                         }
                         
                         choice = false;
